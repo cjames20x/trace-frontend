@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRACE — Temporal Representation & Adaptive Continuous Evaluation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-brand" href="#">TRACE</a>
+  <div class="nav-links">
+    <a href="#verify">Verify</a>
+    <a href="#compare">Compare</a>
+    <a href="#simulate">Simulate</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div>
+    <div class="hero-kicker"><span class="dot"></span>TEMPORAL REPRESENTATION & ADAPTIVE CONTINUOUS EVALUATION</div>
+    <h1>Continuous authentication from the way you touch your phone.</h1>
+    <p class="sub">A Siamese LSTM with temporal attention verifies smartphone users from raw touch, accelerometer, gyroscope and magnetometer streams, evaluated on the H-MOG dataset's reading, typing and map-navigation sessions.</p>
+    <a class="hero-cta" href="#verify">Open verification console →</a>
+
+    <div class="stat-row">
+      <div><span class="stat-num">19</span><span class="stat-label">fused features</span></div>
+      <div><span class="stat-num">40</span><span class="stat-label">timesteps / window</span></div>
+      <div><span class="stat-num">4.7%</span><span class="stat-label">best EER</span></div>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="hero-visual-frame">
+      <div class="hero-visual-grid"></div>
+      <svg viewBox="0 0 300 230" width="100%" height="100%" style="position:relative;">
+        <polyline points="28,190 50,150 68,168 92,100 116,122 142,66 168,102 196,54 222,80 254,42"
+          fill="none" stroke="url(#g1)" stroke-width="2"/>
+        <defs>
+          <linearGradient id="g1" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#1f5fa0"/>
+            <stop offset="100%" stop-color="#1caa74"/>
+          </linearGradient>
+        </defs>
+        <circle cx="254" cy="42" r="6" fill="#1caa74"/>
+        <circle cx="254" cy="42" r="11" fill="#1caa74" opacity="0.2"/>
+      </svg>
+    </div>
+    <div class="hero-visual-caption"><span>x, y, pressure trace</span><span>session_003.csv</span></div>
+  </div>
+</div>
+
+<div style="height:4px; background:var(--teal); margin-bottom:32px;"></div>
+
+<div class="shell">
+
+  <p class="lede">
+    This console demonstrates the verification pipeline described in the thesis
+    <code>Touch-Gesture Continuous Authentication via Siamese LSTM Networks with Temporal Attention</code>.
+  </p>
+
+  <!-- SECTION 1 — CSV VERIFICATION -->
+  <div class="section" id="verify">
+    <div class="section-head">
+      <div>
+        <span class="idx">01 — VERIFICATION</span>
+        <h2>Verify a session</h2>
+        <p class="section-desc">Upload a touch-event CSV and check it against a claimed identity. The encoder embeds both the session and the enrolled reference; a cosine similarity above threshold confirms the match.</p>
+      </div>
+    </div>
+
+    <div class="panel verify-grid">
+      <div class="verify-col">
+        <span class="field-label">SESSION CSV</span>
+        <label class="dropzone" id="verifyDropzone">
+          <input type="file" id="verifyFile" accept=".csv">
+          <div class="dropzone-title" id="verifyFileTitle">Drop a session CSV, or click to browse</div>
+          <div class="dropzone-sub">TouchEvent format, headerless or with an x/y/pressure header row</div>
+        </label>
+
+        <span class="field-label">CLAIMED IDENTITY</span>
+        <select id="claimedUser">
+          <option value="user001">user001</option>
+          <option value="user002">user002</option>
+          <option value="user003">user003</option>
+          <option value="user004">user004</option>
+        </select>
+
+        <button class="btn" id="runVerify" disabled>Run verification</button>
+      </div>
+
+      <div class="verify-col result" id="verifyResult">
+        <div class="result-empty">No session loaded yet. Upload a CSV to run a comparison against the claimed identity's enrolled profile.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="compare">
+    <div class="section-head">
+      <div>
+        <span class="idx">02 — RESULTS</span>
+        <h2>Configuration comparison</h2>
+        <p class="section-desc">Equal error rate and accuracy across encoder variants, evaluated on the same held-out test pairs.</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="config-header-row">
+        <span class="field-label" style="margin:0;">CONFIGURATION</span>
+        <span class="field-label" style="margin:0;">RELATIVE SCORE</span>
+        <div class="metric-toggle" id="metricToggle">
+          <button data-metric="eer" class="active">EER</button>
+          <button data-metric="acc">ACC</button>
+        </div>
+      </div>
+      <div id="configRows"></div>
+    </div>
+  </div>
+
+  <div class="section" id="simulate">
+    <div class="section-head">
+      <div>
+        <span class="idx">03 — SIMULATION</span>
+        <h2>Gesture simulation</h2>
+        <p class="section-desc">Replay an imported session stroke by stroke. Dot position tracks (x, y); dot size tracks contact size / pressure at that timestep.</p>
+      </div>
+    </div>
+
+    <div class="panel sim-grid">
+      <div class="sim-side">
+        <span class="field-label">SESSION CSV</span>
+        <label class="dropzone" id="simDropzone" style="margin-bottom:20px;">
+          <input type="file" id="simFile" accept=".csv">
+          <div class="dropzone-title" id="simFileTitle">Drop a session CSV</div>
+          <div class="dropzone-sub">renders touch path on load</div>
+        </label>
+
+        <span class="field-label">COMPARE AGAINST ENROLLED USER</span>
+        <select id="simUser">
+          <option value="user001">user001</option>
+          <option value="user002">user002</option>
+          <option value="user003">user003</option>
+          <option value="user004">user004</option>
+        </select>
+
+        <div class="legend">
+          <span><i style="background:var(--accent)"></i>touch point</span>
+          <span><i style="background:#c7ccd3"></i>trail</span>
+        </div>
+
+        <div class="sim-live">
+          <div class="sim-live-label">LIVE SIMILARITY TO PROFILE</div>
+          <div class="sim-live-value"><span class="num mono" id="liveScore">—</span></div>
+          <div class="sim-live-sub" id="liveScoreSub">awaiting playback</div>
+        </div>
+      </div>
+
+      <div class="sim-main">
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <canvas id="simCanvas" width="230" height="410"></canvas>
+        </div>
+        <div class="playback">
+          <button class="play-btn" id="playBtn">▶</button>
+          <input type="range" class="scrubber" id="scrubber" min="0" max="100" value="0">
+          <span class="frame-count mono" id="frameCount">0 / 0</span>
+        </div>
+        <div class="speed-row">
+          <button data-speed="0.5">0.5×</button>
+          <button data-speed="1" class="active">1×</button>
+          <button data-speed="2">2×</button>
+          <button data-speed="4">4×</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>Siamese LSTM + temporal attention · 19-feature touch/IMU fusion · evaluated on H-MOG</span>
+</footer>
+
+<script src="script.js"></script>
+
+</body>
+</html>
